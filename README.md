@@ -21,8 +21,30 @@
 
 ---
 
+## 📸 App Preview
+
+<div align="center">
+
+<table>
+  <tr>
+    <td align="center"><img src="screenshots/3.jpg" width="230" /><br/><sub><b>Create Account</b></sub></td>
+    <td align="center"><img src="screenshots/5.jpg" width="230" /><br/><sub><b>Log In</b></sub></td>
+    <td align="center"><img src="screenshots/6.jpg" width="230" /><br/><sub><b>Risk Assessment</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="screenshots/2.jpg" width="230" /><br/><sub><b>Analytics</b></sub></td>
+    <td align="center"><img src="screenshots/1.jpg" width="230" /><br/><sub><b>AI Chat</b></sub></td>
+    <td align="center"><img src="screenshots/4.jpg" width="230" /><br/><sub><b>Multilingual</b></sub></td>
+  </tr>
+</table>
+
+</div>
+
+---
+
 ## 📚 Table of Contents
 
+- [App Preview](#-app-preview)
 - [The Problem We're Addressing](#-the-problem-were-addressing)
 - [Why Ghana, Specifically](#-why-ghana-specifically)
 - [Why These Five Languages](#-why-these-five-languages)
