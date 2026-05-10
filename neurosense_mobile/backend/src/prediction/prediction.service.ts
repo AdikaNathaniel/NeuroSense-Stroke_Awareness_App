@@ -33,7 +33,7 @@ export class PredictionService {
     if (probability < 0.50)
       return 'You have a moderate risk. Consider lifestyle changes: reduce salt intake, exercise regularly, and monitor your blood pressure.';
     if (probability < 0.75)
-      return 'Your risk is high. Please consult your GP soon to discuss your cardiovascular health and risk factors.';
+      return 'Your risk is high. Please consult your General Practitioner soon to discuss your cardiovascular health and risk factors.';
     return 'Critical risk detected. Please seek medical attention immediately or call emergency services.';
   }
 }

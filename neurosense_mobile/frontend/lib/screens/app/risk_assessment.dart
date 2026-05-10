@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../services/api_service.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
+import '../../services/local_history.dart';
+import '../../services/local_predictor.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/profile_button.dart';
 
@@ -36,28 +38,113 @@ class _RiskAssessmentScreenState extends State<RiskAssessmentScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
     try {
-      final res = await ApiService.predict({
+      final age = double.parse(_ageCtrl.text);
+      final glu = double.parse(_glucoseCtrl.text);
+      final bmi = double.parse(_bmiCtrl.text);
+      final res = await LocalPredictor.instance.predict(PredictionInputs(
+        gender: _gender,
+        age: age,
+        hypertension: _hypertension,
+        heartDisease: _heartDisease,
+        everMarried: _everMarried,
+        workType: _workType,
+        residenceType: _residenceType,
+        avgGlucoseLevel: glu,
+        bmi: bmi,
+        smokingStatus: _smokingStatus,
+      ));
+      // Save to local history so the analytics tab can chart it.
+      await LocalHistory.add({
         'gender': _gender,
-        'age': double.parse(_ageCtrl.text),
+        'age': age,
         'hypertension': _hypertension,
         'heart_disease': _heartDisease,
         'ever_married': _everMarried,
         'work_type': _workType,
         'residence_type': _residenceType,
-        'avg_glucose_level': double.parse(_glucoseCtrl.text),
-        'bmi': double.parse(_bmiCtrl.text),
+        'avg_glucose_level': glu,
+        'bmi': bmi,
         'smoking_status': _smokingStatus,
+        'probability': res['probability'],
+        'riskBand': res['riskBand'],
       });
       if (!mounted) return;
-      Navigator.pushNamed(context, '/result', arguments: res);
-    } catch (_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to get prediction. Check your connection.'),
-            backgroundColor: AppColors.riskHigh),
-      );
+      Navigator.pushNamed(context, '/result', arguments: {
+        ...res,
+        'inputs': {
+          'gender': _gender,
+          'age': age,
+          'hypertension': _hypertension,
+          'heart_disease': _heartDisease,
+          'avg_glucose_level': glu,
+          'bmi': bmi,
+          'smoking_status': _smokingStatus,
+        },
+      });
+    } catch (e, st) {
+      if (!mounted) return;
+      _showPredictionErrorDialog(e, st);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  void _showPredictionErrorDialog(Object error, StackTrace stack) {
+    final isPredException = error is PredictionException;
+    final stage = isPredException ? error.stage : 'unknown';
+    final fullText = '$error\n\nStack:\n$stack';
+    debugPrint('PREDICTION FAILED [$stage]\n$fullText');
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+        contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        title: Row(
+          children: [
+            const Icon(Icons.error_outline, color: AppColors.riskHigh),
+            const SizedBox(width: 10),
+            const Text('Prediction failed', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.riskHigh.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(stage, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.riskHigh)),
+            ),
+          ],
+        ),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 360),
+          child: SingleChildScrollView(
+            child: SelectableText(
+              fullText,
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 11.5, height: 1.4, color: AppColors.textPrimary),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton.icon(
+            icon: const Icon(Icons.copy, size: 16),
+            label: const Text('Copy'),
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: fullText));
+              ScaffoldMessenger.of(ctx).showSnackBar(
+                const SnackBar(content: Text('Error copied to clipboard'), duration: Duration(seconds: 2)),
+              );
+            },
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _sectionTitle(String title) => Padding(

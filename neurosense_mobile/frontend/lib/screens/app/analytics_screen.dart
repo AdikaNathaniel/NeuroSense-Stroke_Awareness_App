@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../services/api_service.dart';
+import '../../services/local_history.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/profile_button.dart';
 
@@ -18,13 +18,20 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   void initState() {
     super.initState();
+    LocalHistory.revision.addListener(_load);
     _load();
+  }
+
+  @override
+  void dispose() {
+    LocalHistory.revision.removeListener(_load);
+    super.dispose();
   }
 
   Future<void> _load() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final data = await ApiService.getHistory();
+      final data = await LocalHistory.getAll();
       if (mounted) setState(() { _history = data; _loading = false; });
     } catch (_) {
       if (mounted) setState(() { _error = 'Failed to load analytics.'; _loading = false; });
@@ -177,6 +184,19 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       height: 200,
       child: LineChart(LineChartData(
         minY: 0, maxY: 100,
+        lineTouchData: LineTouchData(
+          enabled: true,
+          touchTooltipData: LineTouchTooltipData(
+            getTooltipColor: (_) => Colors.white,
+            tooltipBorder: const BorderSide(color: AppColors.divider, width: 1),
+            tooltipRoundedRadius: 8,
+            tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            getTooltipItems: (spots) => spots.map((s) => LineTooltipItem(
+                  'Assessment #${s.x.toInt() + 1}\n${s.y.toStringAsFixed(1)}% risk',
+                  const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 12, height: 1.4),
+                )).toList(),
+          ),
+        ),
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
@@ -254,33 +274,39 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               value: e.value.toDouble(),
               color: colors[e.key]!,
               title: '${e.value}',
-              radius: 60,
-              titleStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
+              radius: 40,
+              titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
             ))
         .toList();
 
     return _card(Row(children: [
       SizedBox(
-        height: 180,
-        width: 180,
+        height: 150,
+        width: 150,
         child: PieChart(PieChartData(
           sections: sections,
-          centerSpaceRadius: 42,
+          centerSpaceRadius: 30,
           sectionsSpace: 3,
         )),
       ),
-      const SizedBox(width: 20),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: counts.entries.map((e) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5),
-          child: Row(children: [
-            Container(width: 12, height: 12, decoration: BoxDecoration(color: colors[e.key]!, shape: BoxShape.circle)),
-            const SizedBox(width: 8),
-            Text('${e.key}  ${e.value}x',
-                style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, fontWeight: FontWeight.w500)),
-          ]),
-        )).toList(),
+      const SizedBox(width: 22),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: counts.entries.map((e) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Row(children: [
+              Container(width: 12, height: 12, decoration: BoxDecoration(color: colors[e.key]!, shape: BoxShape.circle)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('${e.key}  ${e.value}x',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, fontWeight: FontWeight.w500)),
+              ),
+            ]),
+          )).toList(),
+        ),
       ),
     ]));
   }
@@ -291,15 +317,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final bmi     = (latest['bmi'] as num?)?.toDouble() ?? 0;
     final glucose = (latest['avg_glucose_level'] as num?)?.toDouble() ?? 0;
 
-    // Healthy reference midpoints: BMI 21.7, Glucose 85
+    // Healthy reference midpoints: BMI 22, Glucose 85.
+    // Reference uses a neutral light-blue so it never gets confused with the
+    // user-value rod (which can be green/orange/red/blue depending on band).
+    final referenceColor = AppColors.primary.withOpacity(0.22);
     final groups = [
       BarChartGroupData(x: 0, barRods: [
         BarChartRodData(toY: bmi, color: _bmiColor(bmi), width: 22, borderRadius: BorderRadius.circular(6)),
-        BarChartRodData(toY: 22, color: AppColors.riskLow.withOpacity(0.35), width: 22, borderRadius: BorderRadius.circular(6)),
+        BarChartRodData(toY: 22, color: referenceColor, width: 22, borderRadius: BorderRadius.circular(6)),
       ]),
       BarChartGroupData(x: 1, barRods: [
         BarChartRodData(toY: glucose, color: _glucoseColor(glucose), width: 22, borderRadius: BorderRadius.circular(6)),
-        BarChartRodData(toY: 85, color: AppColors.riskLow.withOpacity(0.35), width: 22, borderRadius: BorderRadius.circular(6)),
+        BarChartRodData(toY: 85, color: referenceColor, width: 22, borderRadius: BorderRadius.circular(6)),
       ]),
     ];
 
@@ -332,15 +361,35 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
-          barTouchData: BarTouchData(enabled: false),
+          barTouchData: BarTouchData(
+            enabled: true,
+            touchTooltipData: BarTouchTooltipData(
+              getTooltipColor: (_) => Colors.white,
+              tooltipBorder: const BorderSide(color: AppColors.divider, width: 1),
+              tooltipRoundedRadius: 8,
+              tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              getTooltipItem: (group, _, rod, rodIndex) {
+                final metric = group.x == 0 ? 'BMI' : 'Glucose (mg/dL)';
+                final isUserRod = rodIndex == 0;
+                final label = isUserRod ? 'Your $metric' : 'Healthy $metric';
+                return BarTooltipItem(
+                  '$label\n${rod.toY.toStringAsFixed(1)}',
+                  const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 12, height: 1.4),
+                );
+              },
+            ),
+          ),
         )),
       ),
       const SizedBox(height: 10),
-      Row(children: [
-        _legend(AppColors.riskLow.withOpacity(0.5), 'Healthy reference'),
-        const SizedBox(width: 16),
-        _legend(AppColors.riskMedium, 'Your value (if elevated)'),
-      ]),
+      Wrap(
+        spacing: 16,
+        runSpacing: 6,
+        children: [
+          _legend(referenceColor, 'Healthy reference'),
+          _legend(AppColors.textSecondary, 'Your value'),
+        ],
+      ),
     ]));
   }
 
@@ -414,11 +463,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
     return _card(Row(children: [
       SizedBox(
-        height: 180,
-        width: 180,
-        child: PieChart(PieChartData(sections: sections, sectionsSpace: 3, centerSpaceRadius: 38)),
+        height: 150,
+        width: 150,
+        child: PieChart(PieChartData(sections: sections, sectionsSpace: 3, centerSpaceRadius: 32)),
       ),
-      const SizedBox(width: 20),
+      const SizedBox(width: 14),
       Expanded(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _pieLegend(AppColors.riskMedium, 'Modifiable', '$modifiable factor${modifiable != 1 ? 's' : ''}',
@@ -431,21 +480,47 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     ]));
   }
 
-  Widget _pieLegend(Color color, String title, String count, String sub) => Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 3),
-            child: Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-              Text(count, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600)),
-              Text(sub, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, height: 1.4)),
-            ]),
-          ),
-        ],
-      );
+  Widget _pieLegend(Color color, String title, String count, String sub) {
+    // Split the comma-separated sub-label into individual tokens so we can let
+    // them flow across lines independently — no single token is wide enough
+    // to overflow, so two long items meeting (e.g. "hypertension,smoking")
+    // get pushed to the next line automatically.
+    final parts = sub.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 3),
+          child: Container(
+              width: 12, height: 12,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+            Text(count,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 2),
+            Wrap(
+              spacing: 4,
+              runSpacing: 2,
+              children: List<Widget>.generate(parts.length, (i) {
+                final isLast = i == parts.length - 1;
+                return Text(
+                  isLast ? parts[i] : '${parts[i]},',
+                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, height: 1.4),
+                );
+              }),
+            ),
+          ]),
+        ),
+      ],
+    );
+  }
 }

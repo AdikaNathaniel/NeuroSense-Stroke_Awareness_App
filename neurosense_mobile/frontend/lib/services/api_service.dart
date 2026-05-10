@@ -1,6 +1,12 @@
 import 'dart:convert';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../main.dart';
+
+class UnauthorizedException implements Exception {
+  const UnauthorizedException();
+}
 
 class ApiService {
   static const String baseUrl = 'https://neurosense-api.fly.dev/api/v1';
@@ -26,6 +32,22 @@ class ApiService {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
     };
+  }
+
+  /// If [res] is a 401 from a protected endpoint, clear the stored session and
+  /// silently route the user back to the login screen, then throw
+  /// [UnauthorizedException] so callers stop processing the (errored) body.
+  static Future<void> _checkAuth(http.Response res) async {
+    if (res.statusCode != 401) return;
+    await logout();
+    final nav = NeuroSenseApp.navigatorKey.currentState;
+    if (nav != null) {
+      // Defer one frame so we don't navigate during a build.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        nav.pushNamedAndRemoveUntil('/login', (_) => false);
+      });
+    }
+    throw const UnauthorizedException();
   }
 
   // ── Auth ────────────────────────────────────────────────────────────────────
@@ -90,6 +112,7 @@ class ApiService {
       headers: headers,
       body: jsonEncode({'email': email, 'oldPassword': oldPassword, 'newPassword': newPassword}),
     );
+    await _checkAuth(res);
     return jsonDecode(res.body);
   }
 
@@ -101,6 +124,7 @@ class ApiService {
       headers: headers,
       body: jsonEncode(features),
     );
+    await _checkAuth(res);
     return jsonDecode(res.body);
   }
 
@@ -108,6 +132,7 @@ class ApiService {
   static Future<List<dynamic>> getHistory() async {
     final headers = await _authHeaders();
     final res = await http.get(Uri.parse('$baseUrl/history/me'), headers: headers);
+    await _checkAuth(res);
     return jsonDecode(res.body);
   }
 
@@ -119,6 +144,7 @@ class ApiService {
       headers: headers,
       body: jsonEncode({'messages': messages}),
     );
+    await _checkAuth(res);
     final data = jsonDecode(res.body);
     return data['reply'] ?? 'Sorry, I could not get a response.';
   }

@@ -15,11 +15,14 @@ void main() {
 class NeuroSenseApp extends StatelessWidget {
   const NeuroSenseApp({super.key});
 
+  static final navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'NeuroSense',
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       theme: AppTheme.light,
       initialRoute: '/',
       routes: {

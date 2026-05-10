@@ -14,7 +14,7 @@ class AppColors {
   static const riskLow      = Color(0xFF43A047);
   static const riskMedium   = Color(0xFFFB8C00);
   static const riskHigh     = Color(0xFFE53935);
-  static const riskCritical = Color(0xFFB71C1C);
+  static const riskCritical = Color(0xFF4A148C); // Deep Purple — distinct from riskHigh red
 }
 
 class AppTheme {

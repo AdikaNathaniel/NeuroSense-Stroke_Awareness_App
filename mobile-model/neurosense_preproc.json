@@ -1,0 +1,134 @@
+{
+  "threshold": 0.7947325110435486,
+  "n_features": 36,
+  "feature_order": [
+    "age",
+    "avg_glucose_level",
+    "bmi",
+    "age_x_hyp",
+    "age_x_hd",
+    "glu_x_age",
+    "hypertension",
+    "heart_disease",
+    "smoking_was_unknown",
+    "risk_score",
+    "gender_Female",
+    "gender_Male",
+    "ever_married_No",
+    "ever_married_Yes",
+    "work_type_Govt_job",
+    "work_type_Never_worked",
+    "work_type_Private",
+    "work_type_Self-employed",
+    "work_type_children",
+    "residence_type_Rural",
+    "residence_type_Urban",
+    "smoking_status_formerly smoked",
+    "smoking_status_never smoked",
+    "smoking_status_smokes",
+    "age_bin_adult",
+    "age_bin_elderly",
+    "age_bin_middle",
+    "age_bin_senior",
+    "age_bin_young",
+    "glucose_cat_diabetic",
+    "glucose_cat_normal",
+    "glucose_cat_prediabetic",
+    "bmi_cat_normal",
+    "bmi_cat_obese",
+    "bmi_cat_over",
+    "bmi_cat_under"
+  ],
+  "encoder": {
+    "columns": [
+      "gender",
+      "ever_married",
+      "work_type",
+      "residence_type",
+      "smoking_status",
+      "age_bin",
+      "glucose_cat",
+      "bmi_cat"
+    ],
+    "type": "OneHotEncoder",
+    "categories": [
+      [
+        "Female",
+        "Male"
+      ],
+      [
+        "No",
+        "Yes"
+      ],
+      [
+        "Govt_job",
+        "Never_worked",
+        "Private",
+        "Self-employed",
+        "children"
+      ],
+      [
+        "Rural",
+        "Urban"
+      ],
+      [
+        "formerly smoked",
+        "never smoked",
+        "smokes"
+      ],
+      [
+        "adult",
+        "elderly",
+        "middle",
+        "senior",
+        "young"
+      ],
+      [
+        "diabetic",
+        "normal",
+        "prediabetic"
+      ],
+      [
+        "normal",
+        "obese",
+        "over",
+        "under"
+      ]
+    ]
+  },
+  "power_transformer": {
+    "method": "yeo-johnson",
+    "columns": [
+      "age",
+      "avg_glucose_level",
+      "bmi",
+      "age_x_hyp",
+      "age_x_hd",
+      "glu_x_age"
+    ],
+    "lambdas": [
+      0.8618407169019473,
+      -1.0780148098859557,
+      -0.015433189455358829,
+      -2.5675932636365584,
+      -4.168136321382806,
+      0.33025917253549925
+    ],
+    "mean": [
+      28.683692748096767,
+      0.9206968223233718,
+      3.280351875396767,
+      0.03687776681685177,
+      0.013618880793920294,
+      7.194114189286574
+    ],
+    "scale": [
+      13.782193844166406,
+      0.0022859682295993705,
+      0.24075247173409145,
+      0.11402760273262547,
+      0.05551490708369388,
+      2.8264325003489645
+    ]
+  }
+}
