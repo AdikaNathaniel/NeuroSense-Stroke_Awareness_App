@@ -1,0 +1,95 @@
+# ============================================================
+# SECRETS & ENVIRONMENT VARIABLES
+# ============================================================
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+*.env
+!.env.example
+
+# ============================================================
+# NODE / NESTJS
+# ============================================================
+node_modules/
+dist/
+.tsbuildinfo
+coverage/
+*.log
+logs/
+.nyc_output/
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+
+# ============================================================
+# FLUTTER / DART
+# ============================================================
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+.packages
+
+# Android
+android/key.properties
+android/*.jks
+android/*.keystore
+android/local.properties
+android/.gradle/
+android/app/google-services.json
+
+# iOS
+ios/Runner/GoogleService-Info.plist
+ios/Flutter/flutter_export_environment.sh
+ios/.symlinks/
+ios/Pods/
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+lib/firebase_options.dart
+
+# ============================================================
+# PYTHON (ML microservice)
+# ============================================================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+.venv/
+venv/
+env/
+.env/
+*.pkl
+*.joblib
+!neurosense_best_model.joblib
+!neurosense_artifacts.joblib
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ============================================================
+# IDE / OS
+# ============================================================
+.idea/
+.vscode/settings.json
+.vscode/launch.json
+*.iml
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+*.swp
+*~

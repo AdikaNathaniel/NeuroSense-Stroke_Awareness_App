@@ -1,0 +1,121 @@
+# ============================================================
+# SECRETS & ENVIRONMENT VARIABLES — never commit these
+# ============================================================
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+*.env
+!.env.example
+
+# ============================================================
+# BACKEND — NestJS / Node.js
+# ============================================================
+backend/node_modules/
+backend/dist/
+backend/.tsbuildinfo
+backend/coverage/
+backend/*.log
+backend/logs/
+backend/.nyc_output/
+
+# Keys & certificates
+backend/*.pem
+backend/*.key
+backend/*.cert
+backend/*.p12
+backend/*.pfx
+
+# ============================================================
+# FRONTEND — Flutter / Dart
+# ============================================================
+
+# Build outputs
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.pub-cache/
+frontend/.pub/
+frontend/build/
+frontend/.packages
+
+# Android secrets — keystore & signing configs
+frontend/android/key.properties
+frontend/android/*.jks
+frontend/android/*.keystore
+frontend/android/local.properties
+frontend/android/.gradle/
+frontend/android/app/google-services.json
+
+# iOS secrets
+frontend/ios/Runner/GoogleService-Info.plist
+frontend/ios/Flutter/flutter_export_environment.sh
+frontend/ios/.symlinks/
+frontend/ios/Pods/
+
+# Firebase / Google services
+google-services.json
+GoogleService-Info.plist
+frontend/lib/firebase_options.dart
+
+# macOS
+frontend/macos/Flutter/GeneratedPluginRegistrant.swift
+frontend/macos/Flutter/ephemeral/
+
+# Windows
+frontend/windows/flutter/generated_plugin_registrant.cc
+frontend/windows/flutter/generated_plugin_registrant.h
+frontend/windows/flutter/generated_plugins.cmake
+
+# Web
+frontend/web/favicon.png
+
+# IDE
+.idea/
+.vscode/settings.json
+*.iml
+*.iws
+*.ipr
+
+# ============================================================
+# GENERAL
+# ============================================================
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temp files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.apk
+*.aab
+*.ipa

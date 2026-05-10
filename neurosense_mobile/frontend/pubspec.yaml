@@ -1,0 +1,45 @@
+name: neurosense
+description: NeuroSense - Stroke Awareness & Prediction App
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  shared_preferences: ^2.2.2
+  flutter_secure_storage: ^9.0.0
+  provider: ^6.1.2
+  google_fonts: ^6.2.1
+  pin_code_fields: ^8.0.1
+  lottie: ^3.1.0
+  percent_indicator: ^4.2.3
+  fluttertoast: ^8.2.4
+  url_launcher: ^6.3.0
+  cupertino_icons: ^1.0.6
+  fl_chart: ^0.68.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/neuro-sense-padded.png"
+  adaptive_icon_background: "#1565C0"
+  adaptive_icon_foreground: "assets/images/neuro-sense-padded.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  web:
+    generate: false
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

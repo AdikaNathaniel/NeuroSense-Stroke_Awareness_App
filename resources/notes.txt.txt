@@ -1,0 +1,10 @@
+However, one limitation of the current system is that it 
+still requires physician assistance for report evaluation and 
+interpretation. In the future, we plan to enhance the 
+application by integrating a chatbot designed specifically for 
+stroke victims. The chatbot will serve as an accessible and 
+interactive tool, helping stroke victims to better understand 
+their health status and follow up on their recovery process. By 
+offering direct, real-time communication, the chatbot will 
+significantly improve user engagement and support patients 
+on their path to better health and a higher quality of life.
