@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../services/api_service.dart';
+import '../../services/language_service.dart';
 import '../../theme/app_theme.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -9,7 +10,7 @@ class OtpScreen extends StatefulWidget {
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
+class _OtpScreenState extends State<OtpScreen> with LanguageAware {
   String _otp = '';
   bool _loading = false;
   bool _resending = false;
@@ -106,7 +107,7 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Verify Email'), centerTitle: true),
+      appBar: AppBar(title: Text(tr('Verify Email')), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
@@ -157,19 +158,19 @@ class _OtpScreenState extends State<OtpScreen> {
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: _otp.length == 6 ? _verify : null,
-                      child: const Text('Verify OTP'),
+                      child: Text(tr('Verify')),
                     ),
               const SizedBox(height: 20),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Didn't receive it?", style: Theme.of(context).textTheme.bodyMedium),
+                  Text(tr("Didn't receive it?"), style: Theme.of(context).textTheme.bodyMedium),
                   _resending
                       ? const Padding(
                           padding: EdgeInsets.only(left: 8),
                           child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)))
-                      : TextButton(onPressed: _resend, child: const Text('Resend')),
+                      : TextButton(onPressed: _resend, child: Text(tr('Resend Code'))),
                 ],
               ),
             ],

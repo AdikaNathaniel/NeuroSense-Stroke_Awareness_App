@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
+import '../../services/language_service.dart';
 import '../../widgets/ns_logo.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -8,7 +9,7 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with LanguageAware {
   final _formKey   = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   final _passCtrl  = TextEditingController();
@@ -100,13 +101,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email_outlined),
+                  decoration: InputDecoration(
+                    labelText: tr('Email'),
+                    prefixIcon: const Icon(Icons.email_outlined),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Enter your email';
-                    if (!RegExp(r'^[\w.-]+@[\w.-]+\.\w+$').hasMatch(v)) return 'Enter a valid email';
+                    if (v == null || v.isEmpty) return tr('Enter your email');
+                    if (!RegExp(r'^[\w.-]+@[\w.-]+\.\w+$').hasMatch(v)) return tr('Enter a valid email');
                     return null;
                   },
                 ),
@@ -116,35 +117,35 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passCtrl,
                   obscureText: _obscure,
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: tr('Password'),
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(_obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined),
                       onPressed: () => setState(() => _obscure = !_obscure),
                     ),
                   ),
-                  validator: (v) => v == null || v.isEmpty ? 'Enter your password' : null,
+                  validator: (v) => v == null || v.isEmpty ? tr('Enter your password') : null,
                 ),
                 const SizedBox(height: 24),
 
                 _loading
                     ? const CircularProgressIndicator()
-                    : ElevatedButton(onPressed: _login, child: const Text('Log In')),
+                    : ElevatedButton(onPressed: _login, child: Text(tr('Log In'))),
                 const SizedBox(height: 20),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Don't have an account?", style: Theme.of(context).textTheme.bodyMedium),
+                    Text(tr("Don't have an account?"), style: Theme.of(context).textTheme.bodyMedium),
                     TextButton(
                       onPressed: () => Navigator.pushReplacementNamed(context, '/register'),
-                      child: const Text('Sign Up'),
+                      child: Text(tr('Sign Up')),
                     ),
                   ],
                 ),
                 TextButton(
                   onPressed: () => Navigator.pushNamed(context, '/forgot-password'),
-                  child: const Text('Forgot Password?'),
+                  child: Text(tr('Forgot Password?')),
                 ),
                   ],
                 ),

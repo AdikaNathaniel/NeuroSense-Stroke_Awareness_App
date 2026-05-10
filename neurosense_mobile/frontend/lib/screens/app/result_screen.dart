@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import '../../services/language_service.dart';
 import '../../theme/app_theme.dart';
 
 class ResultScreen extends StatefulWidget {
@@ -9,7 +10,7 @@ class ResultScreen extends StatefulWidget {
 }
 
 class _ResultScreenState extends State<ResultScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, LanguageAware {
   late final AnimationController _entryCtrl;
 
   @override

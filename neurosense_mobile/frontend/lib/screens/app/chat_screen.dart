@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
+import '../../services/language_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/profile_button.dart';
 
@@ -15,7 +16,7 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> with LanguageAware {
   final _inputCtrl   = TextEditingController();
   final _scrollCtrl  = ScrollController();
   final List<_Message> _messages = [];

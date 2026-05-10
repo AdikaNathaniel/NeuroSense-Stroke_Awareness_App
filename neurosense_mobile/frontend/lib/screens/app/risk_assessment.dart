@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
+import '../../services/language_service.dart';
 import '../../services/local_history.dart';
 import '../../services/local_predictor.dart';
 import '../../theme/app_theme.dart';
@@ -11,7 +12,7 @@ class RiskAssessmentScreen extends StatefulWidget {
   State<RiskAssessmentScreen> createState() => _RiskAssessmentScreenState();
 }
 
-class _RiskAssessmentScreenState extends State<RiskAssessmentScreen> {
+class _RiskAssessmentScreenState extends State<RiskAssessmentScreen> with LanguageAware {
   final _formKey = GlobalKey<FormState>();
   final _ageCtrl      = TextEditingController();
   final _glucoseCtrl  = TextEditingController();
@@ -106,7 +107,7 @@ class _RiskAssessmentScreenState extends State<RiskAssessmentScreen> {
           children: [
             const Icon(Icons.error_outline, color: AppColors.riskHigh),
             const SizedBox(width: 10),
-            const Text('Prediction failed', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            Text(tr('Prediction failed'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
             const Spacer(),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -130,7 +131,7 @@ class _RiskAssessmentScreenState extends State<RiskAssessmentScreen> {
         actions: [
           TextButton.icon(
             icon: const Icon(Icons.copy, size: 16),
-            label: const Text('Copy'),
+            label: Text(tr('Copy')),
             onPressed: () {
               Clipboard.setData(ClipboardData(text: fullText));
               ScaffoldMessenger.of(ctx).showSnackBar(
@@ -140,7 +141,7 @@ class _RiskAssessmentScreenState extends State<RiskAssessmentScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
+            child: Text(tr('Close')),
           ),
         ],
       ),
@@ -152,17 +153,17 @@ class _RiskAssessmentScreenState extends State<RiskAssessmentScreen> {
         child: Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.primary)),
       );
 
-  Widget _toggle(String label, int value, void Function(int) onChanged) {
+  Widget _toggle(String labelKey, int value, void Function(int) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
+        Text(tr(labelKey), style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
         const SizedBox(height: 8),
         Row(
           children: [
-            _ToggleChip(label: 'No',  selected: value == 0, onTap: () => onChanged(0)),
+            _ToggleChip(label: tr('No'),  selected: value == 0, onTap: () => onChanged(0)),
             const SizedBox(width: 12),
-            _ToggleChip(label: 'Yes', selected: value == 1, onTap: () => onChanged(1)),
+            _ToggleChip(label: tr('Yes'), selected: value == 1, onTap: () => onChanged(1)),
           ],
         ),
       ],
@@ -173,7 +174,7 @@ class _RiskAssessmentScreenState extends State<RiskAssessmentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Risk Assessment'),
+        title: Text(tr('Risk Assessment')),
         centerTitle: true,
         actions: const [ProfileIconButton()],
       ),
@@ -190,80 +191,80 @@ class _RiskAssessmentScreenState extends State<RiskAssessmentScreen> {
                   decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: AppColors.divider)),
                   child: Row(
-                    children: const [
-                      Icon(Icons.info_outline, color: AppColors.primary, size: 20),
-                      SizedBox(width: 10),
-                      Expanded(child: Text('Fill in your details accurately for the best prediction.',
-                          style: TextStyle(fontSize: 13, color: AppColors.textSecondary))),
+                    children: [
+                      const Icon(Icons.info_outline, color: AppColors.primary, size: 20),
+                      const SizedBox(width: 10),
+                      Expanded(child: Text(tr('Fill in your details accurately for the best prediction.'),
+                          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary))),
                     ],
                   ),
                 ),
 
-                _sectionTitle('Personal Information'),
+                _sectionTitle(tr('Personal Information')),
                 DropdownButtonFormField<String>(
                   value: _gender,
-                  decoration: const InputDecoration(labelText: 'Gender', prefixIcon: Icon(Icons.person_outline)),
-                  items: ['Male', 'Female'].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                  decoration: InputDecoration(labelText: tr('Gender'), prefixIcon: const Icon(Icons.person_outline)),
+                  items: ['Male', 'Female'].map((v) => DropdownMenuItem(value: v, child: Text(tr(v)))).toList(),
                   onChanged: (v) => setState(() => _gender = v!),
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _ageCtrl,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Age', prefixIcon: Icon(Icons.cake_outlined)),
+                  decoration: InputDecoration(labelText: tr('Age'), prefixIcon: const Icon(Icons.cake_outlined)),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Enter your age';
+                    if (v == null || v.isEmpty) return tr('Required');
                     final n = double.tryParse(v);
-                    if (n == null || n < 1 || n > 120) return 'Enter a valid age';
+                    if (n == null || n < 1 || n > 120) return tr('Required');
                     return null;
                   },
                 ),
                 const SizedBox(height: 14),
                 DropdownButtonFormField<String>(
                   value: _everMarried,
-                  decoration: const InputDecoration(labelText: 'Ever Married', prefixIcon: Icon(Icons.favorite_outline)),
-                  items: ['Yes', 'No'].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                  decoration: InputDecoration(labelText: tr('Ever Married'), prefixIcon: const Icon(Icons.favorite_outline)),
+                  items: ['Yes', 'No'].map((v) => DropdownMenuItem(value: v, child: Text(tr(v)))).toList(),
                   onChanged: (v) => setState(() => _everMarried = v!),
                 ),
 
-                _sectionTitle('Work & Lifestyle'),
+                _sectionTitle(tr('Work & Lifestyle')),
                 DropdownButtonFormField<String>(
                   value: _workType,
-                  decoration: const InputDecoration(labelText: 'Work Type', prefixIcon: Icon(Icons.work_outline)),
+                  decoration: InputDecoration(labelText: tr('Work Type'), prefixIcon: const Icon(Icons.work_outline)),
                   items: ['Private', 'Self-employed', 'Govt_job', 'children', 'Never_worked']
-                      .map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                      .map((v) => DropdownMenuItem(value: v, child: Text(tr(v)))).toList(),
                   onChanged: (v) => setState(() => _workType = v!),
                 ),
                 const SizedBox(height: 14),
                 DropdownButtonFormField<String>(
                   value: _residenceType,
-                  decoration: const InputDecoration(labelText: 'Residence Type', prefixIcon: Icon(Icons.home_outlined)),
-                  items: ['Urban', 'Rural'].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                  decoration: InputDecoration(labelText: tr('Residence Type'), prefixIcon: const Icon(Icons.home_outlined)),
+                  items: ['Urban', 'Rural'].map((v) => DropdownMenuItem(value: v, child: Text(tr(v)))).toList(),
                   onChanged: (v) => setState(() => _residenceType = v!),
                 ),
                 const SizedBox(height: 14),
                 DropdownButtonFormField<String>(
                   value: _smokingStatus,
-                  decoration: const InputDecoration(labelText: 'Smoking Status', prefixIcon: Icon(Icons.smoking_rooms_outlined)),
+                  decoration: InputDecoration(labelText: tr('Smoking Status'), prefixIcon: const Icon(Icons.smoking_rooms_outlined)),
                   items: ['never smoked', 'formerly smoked', 'smokes', 'Unknown']
-                      .map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                      .map((v) => DropdownMenuItem(value: v, child: Text(tr(v)))).toList(),
                   onChanged: (v) => setState(() => _smokingStatus = v!),
                 ),
 
-                _sectionTitle('Health Conditions'),
+                _sectionTitle(tr('Health Conditions')),
                 _toggle('Hypertension', _hypertension, (v) => setState(() => _hypertension = v)),
                 const SizedBox(height: 16),
                 _toggle('Heart Disease', _heartDisease, (v) => setState(() => _heartDisease = v)),
 
-                _sectionTitle('Medical Measurements'),
+                _sectionTitle(tr('Medical Measurements')),
                 TextFormField(
                   controller: _glucoseCtrl,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                      labelText: 'Avg Glucose Level (mg/dL)', prefixIcon: Icon(Icons.bloodtype_outlined)),
+                  decoration: InputDecoration(
+                      labelText: tr('Avg Glucose Level (mg/dL)'), prefixIcon: const Icon(Icons.bloodtype_outlined)),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Enter glucose level';
-                    if (double.tryParse(v) == null) return 'Enter a valid number';
+                    if (v == null || v.isEmpty) return tr('Required');
+                    if (double.tryParse(v) == null) return tr('Required');
                     return null;
                   },
                 ),
@@ -271,11 +272,11 @@ class _RiskAssessmentScreenState extends State<RiskAssessmentScreen> {
                 TextFormField(
                   controller: _bmiCtrl,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                      labelText: 'BMI (kg/m²)', prefixIcon: Icon(Icons.monitor_weight_outlined)),
+                  decoration: InputDecoration(
+                      labelText: tr('BMI (kg/m²)'), prefixIcon: const Icon(Icons.monitor_weight_outlined)),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Enter BMI';
-                    if (double.tryParse(v) == null) return 'Enter a valid number';
+                    if (v == null || v.isEmpty) return tr('Required');
+                    if (double.tryParse(v) == null) return tr('Required');
                     return null;
                   },
                 ),
@@ -286,7 +287,7 @@ class _RiskAssessmentScreenState extends State<RiskAssessmentScreen> {
                     : ElevatedButton.icon(
                         onPressed: _submit,
                         icon: const Icon(Icons.analytics_outlined),
-                        label: const Text('Get My Risk Score'),
+                        label: Text(tr('Get My Risk Score')),
                       ),
                 const SizedBox(height: 20),
               ],

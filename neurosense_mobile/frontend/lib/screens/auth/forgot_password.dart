@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
+import '../../services/language_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/ns_logo.dart';
 
@@ -9,7 +10,7 @@ class ForgotPasswordScreen extends StatefulWidget {
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> with LanguageAware {
   final _formKey   = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   bool _loading = false;
@@ -76,7 +77,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Forgot Password'), centerTitle: true),
+      appBar: AppBar(title: Text(tr('Forgot Password')), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
@@ -86,9 +87,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               children: [
                 const NsLogo(size: 120),
                 const SizedBox(height: 28),
-                Text('Reset Password', style: Theme.of(context).textTheme.headlineMedium),
+                Text(tr('Forgot Password'), style: Theme.of(context).textTheme.headlineMedium),
                 const SizedBox(height: 8),
-                Text('Enter your email and we\'ll send a temporary password.',
+                Text(tr('Enter your registered email and we will send a temporary password.'),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium),
                 const SizedBox(height: 36),
@@ -96,10 +97,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 TextFormField(
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'Email Address', prefixIcon: Icon(Icons.email_outlined)),
+                  decoration: InputDecoration(labelText: tr('Email'), prefixIcon: const Icon(Icons.email_outlined)),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Enter your email';
-                    if (!RegExp(r'^[\w.-]+@[\w.-]+\.\w+$').hasMatch(v)) return 'Enter a valid email';
+                    if (v == null || v.isEmpty) return tr('Enter your email');
+                    if (!RegExp(r'^[\w.-]+@[\w.-]+\.\w+$').hasMatch(v)) return tr('Enter a valid email');
                     return null;
                   },
                 ),
@@ -107,12 +108,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 _loading
                     ? const CircularProgressIndicator()
-                    : ElevatedButton(onPressed: _submit, child: const Text('Send Reset Email')),
+                    : ElevatedButton(onPressed: _submit, child: Text(tr('Send Temporary Password'))),
                 const SizedBox(height: 16),
 
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Back to Login'),
+                  child: Text(tr('Back')),
                 ),
               ],
             ),

@@ -7,6 +7,7 @@ import { EmailModule } from './email/email.module';
 import { PredictionModule } from './prediction/prediction.module';
 import { ChatModule } from './chat/chat.module';
 import { HistoryModule } from './history/history.module';
+import { TranslateModule } from './translate/translate.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { HistoryModule } from './history/history.module';
     PredictionModule,
     ChatModule,
     HistoryModule,
+    TranslateModule,
   ],
 })
 export class AppModule {}

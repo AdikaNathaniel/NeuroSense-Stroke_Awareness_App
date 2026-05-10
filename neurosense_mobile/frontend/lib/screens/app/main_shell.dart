@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/language_service.dart';
 import '../../theme/app_theme.dart';
 import 'risk_assessment.dart';
 import 'chat_screen.dart';
@@ -12,7 +13,7 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => MainShellState();
 }
 
-class MainShellState extends State<MainShell> {
+class MainShellState extends State<MainShell> with LanguageAware {
   late int _currentIndex;
 
   @override
@@ -23,23 +24,23 @@ class MainShellState extends State<MainShell> {
 
   void switchTab(int index) => setState(() => _currentIndex = index);
 
-  static const _navItems = [
-    BottomNavigationBarItem(
-      icon: Icon(Icons.monitor_heart_outlined),
-      activeIcon: Icon(Icons.monitor_heart_rounded),
-      label: 'Assess',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.chat_bubble_outline_rounded),
-      activeIcon: Icon(Icons.chat_bubble_rounded),
-      label: 'AI Chat',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.bar_chart_outlined),
-      activeIcon: Icon(Icons.bar_chart_rounded),
-      label: 'Analytics',
-    ),
-  ];
+  List<BottomNavigationBarItem> _navItems() => [
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.monitor_heart_outlined),
+          activeIcon: const Icon(Icons.monitor_heart_rounded),
+          label: tr('Assess'),
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.chat_bubble_outline_rounded),
+          activeIcon: const Icon(Icons.chat_bubble_rounded),
+          label: tr('AI Chat'),
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.bar_chart_outlined),
+          activeIcon: const Icon(Icons.bar_chart_rounded),
+          label: tr('Analytics'),
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +63,7 @@ class MainShellState extends State<MainShell> {
         unselectedLabelStyle: const TextStyle(fontSize: 11),
         backgroundColor: Colors.white,
         elevation: 12,
-        items: _navItems,
+        items: _navItems(),
       ),
     );
   }

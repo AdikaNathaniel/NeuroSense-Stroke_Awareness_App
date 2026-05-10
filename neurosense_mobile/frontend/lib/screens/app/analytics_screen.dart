@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../../services/language_service.dart';
 import '../../services/local_history.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/profile_button.dart';
@@ -10,7 +11,7 @@ class AnalyticsScreen extends StatefulWidget {
   State<AnalyticsScreen> createState() => _AnalyticsScreenState();
 }
 
-class _AnalyticsScreenState extends State<AnalyticsScreen> {
+class _AnalyticsScreenState extends State<AnalyticsScreen> with LanguageAware {
   List<dynamic> _history = [];
   bool _loading = true;
   String? _error;
@@ -42,7 +43,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analytics'),
+        title: Text(tr('Analytics')),
         centerTitle: true,
         actions: const [ProfileIconButton()],
       ),
@@ -62,7 +63,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           const SizedBox(height: 12),
           Text(_error!, style: const TextStyle(color: AppColors.textSecondary)),
           const SizedBox(height: 16),
-          ElevatedButton(onPressed: _load, child: const Text('Retry')),
+          ElevatedButton(onPressed: _load, child: Text(tr('Retry'))),
         ]),
       );
 
@@ -74,13 +75,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             child: const Icon(Icons.bar_chart_rounded, size: 44, color: AppColors.primary),
           ),
           const SizedBox(height: 16),
-          const Text('No data yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+          Text(tr('No data yet'),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
           const SizedBox(height: 8),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 48),
-            child: Text('Complete your first risk assessment to see your personal analytics here.',
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 48),
+            child: Text(tr('Complete your first risk assessment to see your personal analytics here.'),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textSecondary, height: 1.5)),
+                style: const TextStyle(color: AppColors.textSecondary, height: 1.5)),
           ),
         ]),
       );
@@ -95,19 +97,19 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         children: [
           _statsRow(),
           const SizedBox(height: 20),
-          _sectionHeader('Risk Score Trend', Icons.show_chart_rounded),
+          _sectionHeader(tr('Risk Score Trend'), Icons.show_chart_rounded),
           const SizedBox(height: 12),
           _riskTrendChart(),
           const SizedBox(height: 24),
-          _sectionHeader('Risk Band Distribution', Icons.pie_chart_rounded),
+          _sectionHeader(tr('Risk Band Distribution'), Icons.pie_chart_rounded),
           const SizedBox(height: 12),
           _riskBandDonut(),
           const SizedBox(height: 24),
-          _sectionHeader('Vitals vs Healthy Range', Icons.monitor_heart_rounded),
+          _sectionHeader(tr('Vitals vs Healthy Range'), Icons.monitor_heart_rounded),
           const SizedBox(height: 12),
           _vitalsBarChart(latest),
           const SizedBox(height: 24),
-          _sectionHeader('Risk Factor Breakdown (Latest)', Icons.donut_large_rounded),
+          _sectionHeader(tr('Risk Factor Breakdown (Latest)'), Icons.donut_large_rounded),
           const SizedBox(height: 12),
           _riskFactorPie(latest),
           const SizedBox(height: 24),
@@ -126,11 +128,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final trend  = probs.length > 1 ? latest - probs[probs.length - 2] : 0.0;
 
     return Row(children: [
-      _statCard('Assessments', '$count', Icons.assignment_rounded, AppColors.primary),
+      _statCard(tr('Assessments'), '$count', Icons.assignment_rounded, AppColors.primary),
       const SizedBox(width: 10),
-      _statCard('Avg Risk', '${avg.toStringAsFixed(1)}%', Icons.analytics_rounded, AppColors.primaryLight),
+      _statCard(tr('Avg Risk'), '${avg.toStringAsFixed(1)}%', Icons.analytics_rounded, AppColors.primaryLight),
       const SizedBox(width: 10),
-      _statCard('Trend', '${trend >= 0 ? '+' : ''}${trend.toStringAsFixed(1)}%',
+      _statCard(tr('Trend'), '${trend >= 0 ? '+' : ''}${trend.toStringAsFixed(1)}%',
           trend <= 0 ? Icons.trending_down_rounded : Icons.trending_up_rounded,
           trend <= 0 ? AppColors.riskLow : AppColors.riskHigh),
     ]);
@@ -158,7 +160,12 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   Widget _sectionHeader(String title, IconData icon) => Row(children: [
         Icon(icon, color: AppColors.primary, size: 20),
         const SizedBox(width: 8),
-        Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+        Expanded(
+          child: Text(title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+        ),
       ]);
 
   Widget _card(Widget child) => Container(
@@ -369,9 +376,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               tooltipRoundedRadius: 8,
               tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               getTooltipItem: (group, _, rod, rodIndex) {
-                final metric = group.x == 0 ? 'BMI' : 'Glucose (mg/dL)';
+                final metric = group.x == 0 ? tr('BMI') : tr('Glucose (mg/dL)');
                 final isUserRod = rodIndex == 0;
-                final label = isUserRod ? 'Your $metric' : 'Healthy $metric';
+                final label = isUserRod ? '${tr('Your value')}: $metric' : '${tr('Healthy reference')}: $metric';
                 return BarTooltipItem(
                   '$label\n${rod.toY.toStringAsFixed(1)}',
                   const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 12, height: 1.4),
@@ -386,8 +393,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         spacing: 16,
         runSpacing: 6,
         children: [
-          _legend(referenceColor, 'Healthy reference'),
-          _legend(AppColors.textSecondary, 'Your value'),
+          _legend(referenceColor, tr('Healthy reference')),
+          _legend(AppColors.textSecondary, tr('Your value')),
         ],
       ),
     ]));
@@ -470,11 +477,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       const SizedBox(width: 14),
       Expanded(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _pieLegend(AppColors.riskMedium, 'Modifiable', '$modifiable factor${modifiable != 1 ? 's' : ''}',
-              'BMI, glucose, hypertension, smoking'),
+          _pieLegend(AppColors.riskMedium, tr('Modifiable'), '$modifiable factor${modifiable != 1 ? 's' : ''}',
+              '${tr('BMI')}, ${tr('Glucose').toLowerCase()}, ${tr('Hypertension').toLowerCase()}, ${tr('smokes').toLowerCase()}'),
           const SizedBox(height: 14),
-          _pieLegend(AppColors.primary, 'Non-Modifiable', '$nonModifiable factor${nonModifiable != 1 ? 's' : ''}',
-              'Age, gender, heart disease'),
+          _pieLegend(AppColors.primary, tr('Non-Modifiable'), '$nonModifiable factor${nonModifiable != 1 ? 's' : ''}',
+              '${tr('Age')}, ${tr('Gender').toLowerCase()}, ${tr('Heart Disease').toLowerCase()}'),
         ]),
       ),
     ]));

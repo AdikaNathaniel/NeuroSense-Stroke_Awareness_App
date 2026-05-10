@@ -136,6 +136,20 @@ class ApiService {
     return jsonDecode(res.body);
   }
 
+  // ── Translation (public, no JWT required) ──────────────────────────────────
+  static Future<List<String>> translate(List<String> texts, String targetLanguage) async {
+    final res = await http.post(
+      Uri.parse('$baseUrl/translate'),
+      headers: const {'Content-Type': 'application/json'},
+      body: jsonEncode({'texts': texts, 'targetLanguage': targetLanguage}),
+    );
+    if (res.statusCode != 200 && res.statusCode != 201) {
+      throw Exception('Translate failed (HTTP ${res.statusCode}): ${res.body}');
+    }
+    final data = jsonDecode(res.body);
+    return List<String>.from(data['translations'] ?? const []);
+  }
+
   // ── Chatbot ─────────────────────────────────────────────────────────────────
   static Future<String> chat(List<Map<String, String>> messages) async {
     final headers = await _authHeaders();

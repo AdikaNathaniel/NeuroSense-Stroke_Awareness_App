@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/language_service.dart';
 import '../theme/app_theme.dart';
+import 'language_picker.dart';
 
 class ProfileIconButton extends StatelessWidget {
   const ProfileIconButton({super.key});
@@ -9,14 +11,14 @@ class ProfileIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.person_outline),
-      tooltip: 'Profile',
+      tooltip: tr('Profile'),
       onPressed: () => showProfileSheet(context),
     );
   }
 }
 
 Future<void> showProfileSheet(BuildContext context) async {
-  final name  = await ApiService.getUserName()  ?? 'NeuroSense User';
+  final name  = await ApiService.getUserName()  ?? tr('NeuroSense User');
   final email = await ApiService.getUserEmail() ?? '—';
   if (!context.mounted) return;
   showModalBottomSheet(
@@ -51,13 +53,55 @@ Future<void> showProfileSheet(BuildContext context) async {
             Text(email, textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
             const SizedBox(height: 24),
+            // ── Language row ─────────────────────────────────────────────────
+            ListenableBuilder(
+              listenable: LanguageService.instance,
+              builder: (_, __) {
+                final opt = LanguageService.instance.currentOption;
+                return InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {
+                    Navigator.pop(sheetCtx);
+                    showLanguagePicker(context);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.divider),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.language_rounded, color: AppColors.primary, size: 22),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(tr('Language'),
+                                  style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                              const SizedBox(height: 2),
+                              Text(opt.nativeName,
+                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary, size: 22),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: () {
                 Navigator.pop(sheetCtx);
                 _showChangePasswordDialog(context, email);
               },
               icon: const Icon(Icons.lock_outline),
-              label: const Text('Change Password'),
+              label: Text(tr('Change Password')),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
                 side: const BorderSide(color: AppColors.primary, width: 2),
@@ -74,7 +118,7 @@ Future<void> showProfileSheet(BuildContext context) async {
                 Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
               },
               icon: const Icon(Icons.logout, color: AppColors.riskHigh),
-              label: const Text('Log Out', style: TextStyle(color: AppColors.riskHigh)),
+              label: Text(tr('Log Out'), style: const TextStyle(color: AppColors.riskHigh)),
             ),
           ],
         ),
