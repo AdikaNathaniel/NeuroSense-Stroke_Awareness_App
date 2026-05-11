@@ -1,4 +1,17 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Strip permissions a transitive AndroidX library would otherwise inject.
+         The app doesn't read phone state, write external storage, or read
+         external storage, so suppressing these keeps Play Console happy and
+         avoids needing a privacy policy entry for them. -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"      tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"  tools:node="remove" />
+
+    <!-- Needed for the AI Chat + Translate features (HTTPS to our backend). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:label="NeuroSense"
         android:name="${applicationName}"
